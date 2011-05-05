@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+	<TextView  
+		android:id="@+id/hello"
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content" 
+	    android:text="@string/hello"
+	    />
+    <com.sc.android.view.RangeSeekBar xmlns:sc="http://schemas.android.com/apk/res/com.sc.android.view"
+		android:id="@+id/rangeSeekBarView1"
+		android:layout_width="match_parent"
+   		android:layout_height="wrap_content"
+   		android:padding="2dp"
+   		android:layout_margin="4dp"
+   		android:background="@drawable/rangeseekbar"
+		
+   		sc:orientation="horizontal"
+   		
+   		sc:limitThumbRange="true"
+   		
+   		sc:scaleMin="0"
+   		sc:scaleMax="100"
+   		sc:scaleStep="5.0"
+   		
+   		sc:thumb="@drawable/thumb"
+   		sc:thumbs="2"
+   		sc:thumbWidth="50dp"
+   		sc:thumbHeight="50dp"
+   		
+   		sc:track="@drawable/trackgradient"
+   		sc:range="@drawable/rangegradient"/>
+</LinearLayout>

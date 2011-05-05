@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+     <declare-styleable name="RangeSeekBar">
+     
+     	<attr name="orientation" format="string"/>
+     	<attr name="limitThumbRange" format="boolean"/>
+     	
+     	
+     	<attr name="scaleMin" format="float"/>
+        <attr name="scaleMax" format="float"/>
+        <attr name="scaleStep" format="float"/>
+        
+        <attr name="thumb" format="reference"/>
+        <attr name="thumbs" format="integer"/>
+        <attr name="thumbWidth" format="dimension"/>
+        <attr name="thumbHeight" format="dimension"/>
+        
+        <attr name="track" format="reference"/>
+        
+        <attr name="range" format="reference"/>
+    </declare-styleable>
+</resources>
