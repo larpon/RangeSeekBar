@@ -427,9 +427,10 @@ public class RangeSeekBar extends View {
     private void drawThumbs(Canvas canvas) {
     	if(!thumbs.isEmpty()) {
     		//Paint p = new Paint();
-    		Rect area1 = new Rect();
+    		
     		
     		for(Thumb th : thumbs) {
+    			Rect area1 = new Rect();
     			//Log.d(TAG,""+th.pos);
     			if(orientation == VERTICAL) {
     				area1.left = 0 + getPaddingLeft();
