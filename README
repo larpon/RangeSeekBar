@@ -84,3 +84,42 @@ public class Main extends Activity {
 	}
 
 }
+
+to instantiate a RangeSeekBar from code without the use of XML do:
+
+RangeSeekBar rangeSeekBar = new RangeSeekBar(Context);
+or
+RangeSeekBar rangeSeekBar = new RangeSeekBar(Context,AttributeSet);
+
+Public methods include:
+
+    public void distributeThumbsEvenly()
+    public float getThumbValue(int index)
+    public void setThumbValue(int index, float value)
+       
+    public interface RangeSeekBarListener {
+    	public void onCreate(int index, float value);
+    	public void onSeek(int index, float value);
+    }
+    
+    public void setListener(RangeSeekBarListener listener)
+	public int getOrientation()
+	public void setOrientation(int orientation)
+	public float getThumbWidth()
+	public void setThumbWidth(float thumbWidth)
+	public float getThumbHeight()
+	public void setThumbHeight(float thumbHeight)
+	public boolean isLimitThumbRange()
+	public void setLimitThumbRange(boolean limitThumbRange)
+	public float getScaleRangeMin()
+	public void setScaleRangeMin(float scaleRangeMin)
+	public float getScaleRangeMax()
+	public void setScaleRangeMax(float scaleRangeMax)
+	public float getScaleStep()
+	public void setScaleStep(float scaleStep)
+	public Drawable getTrack()
+	public void setTrack(Drawable track)
+	public Drawable getRange()
+	public void setRange(Drawable range)
+	public Drawable getThumb()
+	public void setThumb(Drawable thumb)
