@@ -618,4 +618,12 @@ public class RangeSeekBar extends View {
 		this.thumb = thumb;
 	}
 
+	public void initThumbs(int noThumbs)
+	{
+        for(int i = 0; i < noThumbs; i++) {
+        	Thumb th = new Thumb();
+        	thumbs.add(th);
+        }
+	}
+	
 }
