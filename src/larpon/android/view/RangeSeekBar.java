@@ -1,7 +1,9 @@
-package com.sc.android.view;
+package larpon.android.view;
 
 import java.util.List;
 import java.util.Vector;
+
+import com.sc.android.view.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;
