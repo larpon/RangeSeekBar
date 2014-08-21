@@ -12,5 +12,5 @@ Lars explain things better than I ever could. You can include RangeSeekBar as a 
 ---
 ## Examples
 
-For example usage please refer to the new RangeSeekBarExamples repository:
+For example usage please refer to the RangeSeekBarExamples repository:
 https://github.com/Larpon/RangeSeekBarExamples
