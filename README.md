@@ -3,11 +3,6 @@
 This is an initial version of a View for Android that tries to mimic the behavior of the JQueryUI Slider widget.
 
 ---
-## Questions and ideas
-
-https://groups.google.com/d/topic/android-developers/ZV5tAHnjl1A/discussion
-
----
 ## Usage
 To include this library in your project please refer to Lars Vogel's tutorial on how to use Android libraries with Eclipse:
 http://www.vogella.com/tutorials/AndroidLibraryProjects/article.html
