@@ -1,7 +1,10 @@
-package com.sc.android.view;
+package larpon.android.view;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Vector;
+
+import com.sc.android.view.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -90,7 +93,7 @@ public class RangeSeekBar extends View {
         
         String s = a.getString(R.styleable.RangeSeekBar_orientation);
         if(s != null)
-        	orientation = s.toLowerCase().contains("vertical") ? VERTICAL : HORIZONTAL;
+        	orientation = s.toLowerCase(Locale.ENGLISH).contains("vertical") ? VERTICAL : HORIZONTAL;
         
         limitThumbRange = a.getBoolean(R.styleable.RangeSeekBar_limitThumbRange, true);
         
@@ -108,10 +111,9 @@ public class RangeSeekBar extends View {
         int noThumbs = a.getInt(R.styleable.RangeSeekBar_thumbs, DEFAULT_THUMBS);
         thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, 50);
 		thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, 100);
-        for(int i = 0; i < noThumbs; i++) {
-        	Thumb th = new Thumb();
-        	thumbs.add(th);
-        }
+		
+		initThumbs(noThumbs);
+        
         a.recycle();
     }
 

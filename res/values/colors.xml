@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-	<color name="white">#ffffffff</color>
-	<color name="white_50_opacity">#80ffffff</color>
-	<color name="black">#ff000000</color>
-	<color name="black_50_opacity">#80000000</color>
-	<color name="red">#ffff0000</color>
-</resources>
