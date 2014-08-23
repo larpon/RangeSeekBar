@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true"
+          android:drawable="@drawable/scgradient" /> <!- pressed ->
+    <item android:state_focused="true"
+          android:drawable="@drawable/trackgradient" /> <!- focused ->
+    <item android:drawable="@drawable/rangegradient" /> <!- default ->
+</selector>
+--> 
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+	<item>
+		<shape android:shape="rectangle" >
+			<corners android:radius="7dip" />
+			<solid android:color="#FFdddddd" />
+			<stroke android:width="2px" android:color="#88585858"/>
+		</shape>
+	</item>
+</layer-list>
+
