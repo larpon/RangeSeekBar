@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
 
-import com.sc.android.view.R;
+import larpon.android.view.R;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -24,9 +24,11 @@ public class RangeSeekBar extends View {
 	public static final int VERTICAL = 1;
 	
 	private static final int DEFAULT_THUMBS = 2;
+	private static final int DEFAULT_THUMB_WIDTH = 50;
+	private static final int DEFAULT_THUMB_HEIGHT = 50;
 	private static final float DEFAULT_STEP = 5.0f;
 	
-	private List<RangeSeekBarListener> listeners;
+	private RangeSeekBarListener listener;
 	
 	private List<Thumb> thumbs;
 	private float thumbWidth;
@@ -47,8 +49,9 @@ public class RangeSeekBar extends View {
 	private Drawable thumb;
 	
 	private boolean firstRun;
+	private boolean isSeeking;
 	
-	private void init(Context context) {
+	private void initDefaults() {
 		orientation = HORIZONTAL;
 		limitThumbRange = true;
 		scaleRangeMin = 0;
@@ -58,22 +61,29 @@ public class RangeSeekBar extends View {
 		viewWidth = 0;
 		viewHeight = 0;
 		
-		thumbWidth = 50;
-		thumbHeight = 100;
+		thumbWidth = DEFAULT_THUMB_WIDTH;
+		thumbHeight = DEFAULT_THUMB_HEIGHT;
 
 		thumbs = new Vector<Thumb>();
-		listeners = new Vector<RangeSeekBarListener>();
 		
 		this.setFocusable(true);
 		this.setFocusableInTouchMode(true);
 		
+		this.setBackgroundDrawable(getResources().getDrawable(R.drawable.rangeseekbar));
+		thumb = getResources().getDrawable(R.drawable.thumb);
+        range = getResources().getDrawable(R.drawable.rangegradient);
+        track = getResources().getDrawable(R.drawable.trackgradient);
+		
 		firstRun = true;
+		isSeeking = false;
 	}
+	
 	
 	public RangeSeekBar(Context context) {
 		super(context);
-		init(context);
+		initDefaults();
 		
+		initThumbs(DEFAULT_THUMBS);
 	}
 
 	/**
@@ -85,7 +95,7 @@ public class RangeSeekBar extends View {
      */
     public RangeSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        initDefaults();
 
         // Obtain our styled custom attributes from xml
         TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.RangeSeekBar);
@@ -101,16 +111,22 @@ public class RangeSeekBar extends View {
         scaleRangeMax = a.getFloat(R.styleable.RangeSeekBar_scaleMax, 100);
         scaleStep = Math.abs(a.getFloat(R.styleable.RangeSeekBar_scaleStep, DEFAULT_STEP));
         
-        thumb = a.getDrawable(R.styleable.RangeSeekBar_thumb);
+        Drawable aThumb = a.getDrawable(R.styleable.RangeSeekBar_thumb);
+        if(aThumb != null)
+        	thumb = aThumb;
         
-        range = a.getDrawable(R.styleable.RangeSeekBar_range);
+        Drawable aRange = a.getDrawable(R.styleable.RangeSeekBar_range);
+        if(aRange != null)
+        	range = aRange;
         
-        track = a.getDrawable(R.styleable.RangeSeekBar_track);
+        Drawable aTrack = a.getDrawable(R.styleable.RangeSeekBar_track);
+        if(aTrack != null)
+        	track = aTrack;
         
         // Register desired amount of thumbs
         int noThumbs = a.getInt(R.styleable.RangeSeekBar_thumbs, DEFAULT_THUMBS);
-        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, 50);
-		thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, 100);
+        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, DEFAULT_THUMB_WIDTH);
+		thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, DEFAULT_THUMB_HEIGHT);
 		
 		initThumbs(noThumbs);
         
@@ -137,11 +153,8 @@ public class RangeSeekBar extends View {
     	if(firstRun) {
             distributeThumbsEvenly();
             // Fire listener callback
-    		if(listeners != null && listeners.size() > 0) {
-    			for(RangeSeekBarListener l : listeners) {
-    				l.onCreate(currentThumb,getThumbValue(currentThumb));
-    			}
-    		}
+    		if(listener != null)
+    			listener.onCreate(this, currentThumb, getThumbValue(currentThumb));
     		firstRun = false;
     	}
     }
@@ -171,20 +184,19 @@ public class RangeSeekBar extends View {
     public boolean onTouchEvent (MotionEvent event) {
     	if(!thumbs.isEmpty()) {
 
-    		//boolean testFocus = this.requestFocus();
-    		//Log.d(TAG,"Focus: "+testFocus);
     		float coordinate = (orientation == VERTICAL) ? event.getY() : event.getX();
-    		
-			// Find thumb closest to event coordinate on screen touch
-	    	if(event.getAction() == MotionEvent.ACTION_DOWN) {
+    		int action = event.getAction();
+			
+    		// Find thumb closest to event coordinate on screen touch
+	    	if(action == MotionEvent.ACTION_DOWN) {
 	    		currentThumb = getClosestThumb(coordinate);
 	    		Log.d(TAG,"Closest "+currentThumb);
 	    		lowLimit = getLowerThumbRangeLimit(currentThumb);
 	    		highLimit = getHigherThumbRangeLimit(currentThumb);
 	    	}
 	    	
-	    	if(event.getAction() == MotionEvent.ACTION_CANCEL || event.getAction() == MotionEvent.ACTION_UP) {
-	    		// 
+	    	if(action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
+	    		//
 	    	}
 				
 			// Update thumb position
@@ -207,13 +219,21 @@ public class RangeSeekBar extends View {
 				//Log.d(TAG,"Setting coordinate "+coordinate);
 			}
 
+    		float thumbValue = getThumbValue(currentThumb);
+    		
 			// Fire listener callbacks
-    		if(listeners != null && listeners.size() > 0) {
-    			for(RangeSeekBarListener l : listeners) {
-    				l.onSeek(currentThumb,getThumbValue(currentThumb));
-    			}
+    		if(listener != null) {
+    			
+    			// Find thumb closest to event coordinate on screen touch
+    	    	if(action == MotionEvent.ACTION_DOWN) {
+    	    		listener.onSeekStart(this, currentThumb, thumbValue);
+	    			isSeeking = true;
+    	    	} else if(action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
+    	    		listener.onSeekStop(this, currentThumb, thumbValue);
+	    			isSeeking = false;
+    	    	} else
+	    			listener.onSeek(this, currentThumb, thumbValue);
     		}
-	    	
     		// Tell the view we want a complete redraw
 			//invalidate();
 			
@@ -448,8 +468,10 @@ public class RangeSeekBar extends View {
     	            //Log.d(TAG,"th: "+area1.toString());
 	    		}
 	            
-	    		thumb.setBounds(area1);
-	    		thumb.draw(canvas);    
+    			if(thumb != null) {
+		    		thumb.setBounds(area1);
+		    		thumb.draw(canvas);
+    			}
         	}
     	}
     }
@@ -532,14 +554,16 @@ public class RangeSeekBar extends View {
     }
 
     public interface RangeSeekBarListener {
-    	public void onCreate(int index, float value);
-    	public void onSeek(int index, float value);
+    	public void onCreate(RangeSeekBar rangeSeekBar, int index, float value);
+    	public void onSeek(RangeSeekBar rangeSeekBar, int index, float value);
+    	public void onSeekStart(RangeSeekBar rangeSeekBar, int index, float value);
+    	public void onSeekStop(RangeSeekBar rangeSeekBar, int index, float value);
     }
     
     public void setListener(RangeSeekBarListener listener) {
-		listeners.add(listener);
+		this.listener = listener;
 	}
-
+    
 	public int getOrientation() {
 		return orientation;
 	}
@@ -620,12 +644,17 @@ public class RangeSeekBar extends View {
 		this.thumb = thumb;
 	}
 
-	public void initThumbs(int noThumbs)
-	{
-        for(int i = 0; i < noThumbs; i++) {
-        	Thumb th = new Thumb();
-        	thumbs.add(th);
-        }
+	public void initThumbs(int noThumbs) {
+		if(thumbs != null) {
+			thumbs.clear();
+	        for(int i = 0; i < noThumbs; i++) {
+	        	Thumb th = new Thumb();
+	        	thumbs.add(th);
+	        }
+		}
 	}
 	
+	public boolean isSeeking() {
+        return isSeeking;
+	}
 }
