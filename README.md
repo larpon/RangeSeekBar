@@ -26,7 +26,7 @@ Then, to use the library in your project add the following to your `build.gradle
 
 ```groovy
 dependencies {
-    compile 'com.sc.android.view:range-seek-bar:1.0.0'
+    compile 'larpon.android.view:range-seek-bar:1.0.0'
 }
 ```
 
