@@ -37,3 +37,13 @@ proguard.cfg
 
 #Linux tmp files
 *~
+
+# Gradle
+.idea
+*.iml
+*.ipr
+*.iws
+.gradle/
+build/
+.gradletasknamecache
+gradle.properties
