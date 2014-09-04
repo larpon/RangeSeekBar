@@ -7,14 +7,17 @@ RangeSeekBar is a custom view for the Android platform that makes it possible to
 The view should work on Android devices from API level 3 and up (Android 1.5).
 
 ---
+
 ## Usage
+
+###Eclipse
 To include this library in your project please refer to Lars Vogel's tutorial on how to use Android libraries with Eclipse:
 http://www.vogella.com/tutorials/AndroidLibraryProjects/article.html
 
 Lars explain things better than I ever could. You can include RangeSeekBar as a library source (import it as an Android Library in Eclipse) or you can use it as a .jar library (include by copying one of the release tag .jars to your project's libs/ folder).
 
 
-## Gradle build
+### Gradle build
 
 To deploy the library to your local Maven repository run the following task:
 
