@@ -182,6 +182,8 @@ public class RangeSeekBar extends View {
      */
     @Override
     public boolean onTouchEvent (MotionEvent event) {
+        if(!isEnabled())
+            return false;
     	if(!thumbs.isEmpty()) {
 
     		float coordinate = (orientation == VERTICAL) ? event.getY() : event.getX();
