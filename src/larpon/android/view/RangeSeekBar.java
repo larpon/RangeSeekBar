@@ -522,6 +522,9 @@ public class RangeSeekBar extends View {
         int specMode = MeasureSpec.getMode(measureSpec);
         int specSize = MeasureSpec.getSize(measureSpec);
 
+        if (specMode == MeasureSpec.UNSPECIFIED)
+            return (int) (thumbHeight + getPaddingTop() + getPaddingBottom());
+
         if (specMode == MeasureSpec.EXACTLY) {
             // We were told how big to be
         	//Log.d(TAG,"measureHeight() EXACTLY");
