@@ -659,4 +659,15 @@ public class RangeSeekBar extends View {
 	public boolean isSeeking() {
         return isSeeking;
 	}
+
+	@Override
+	protected void drawableStateChanged()
+	{
+		super.drawableStateChanged();
+
+		int[] drawableState = getDrawableState();
+		thumb.setState(drawableState);
+		track.setState(drawableState);
+		range.setState(drawableState);
+	}
 }
