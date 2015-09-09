@@ -2,21 +2,21 @@
 <resources>
      <declare-styleable name="RangeSeekBar">
      
-     	<attr name="orientation" format="string"/>
-     	<attr name="limitThumbRange" format="boolean"/>
+     	<attr name="rsb_orientation" format="string"/>
+     	<attr name="rsb_limitThumbRange" format="boolean"/>
      	
      	
-     	<attr name="scaleMin" format="float"/>
-        <attr name="scaleMax" format="float"/>
-        <attr name="scaleStep" format="float"/>
+     	<attr name="rsb_scaleMin" format="float"/>
+        <attr name="rsb_scaleMax" format="float"/>
+        <attr name="rsb_scaleStep" format="float"/>
         
-        <attr name="thumb" format="reference"/>
-        <attr name="thumbs" format="integer"/>
-        <attr name="thumbWidth" format="dimension"/>
-        <attr name="thumbHeight" format="dimension"/>
+        <attr name="rsb_thumb" format="reference"/>
+        <attr name="rsb_thumbs" format="integer"/>
+        <attr name="rsb_thumbWidth" format="dimension"/>
+        <attr name="rsb_thumbHeight" format="dimension"/>
         
-        <attr name="track" format="reference"/>
+        <attr name="rsb_track" format="reference"/>
         
-        <attr name="range" format="reference"/>
+        <attr name="rsb_range" format="reference"/>
     </declare-styleable>
 </resources>
