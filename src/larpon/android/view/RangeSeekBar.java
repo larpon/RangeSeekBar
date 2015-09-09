@@ -101,36 +101,36 @@ public class RangeSeekBar extends View {
         TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.RangeSeekBar);
         
         
-        String s = a.getString(R.styleable.RangeSeekBar_orientation);
+        String s = a.getString(R.styleable.RangeSeekBar_rsb_orientation);
         if(s != null)
             orientation = s.toLowerCase(Locale.ENGLISH).contains("vertical") ? VERTICAL : HORIZONTAL;
         
-        limitThumbRange = a.getBoolean(R.styleable.RangeSeekBar_limitThumbRange, true);
+        limitThumbRange = a.getBoolean(R.styleable.RangeSeekBar_rsb_limitThumbRange, true);
         
-        scaleRangeMin = a.getFloat(R.styleable.RangeSeekBar_scaleMin, 0);
-        scaleRangeMax = a.getFloat(R.styleable.RangeSeekBar_scaleMax, 100);
-        scaleStep = Math.abs(a.getFloat(R.styleable.RangeSeekBar_scaleStep, DEFAULT_STEP));
+        scaleRangeMin = a.getFloat(R.styleable.RangeSeekBar_rsb_scaleMin, 0);
+        scaleRangeMax = a.getFloat(R.styleable.RangeSeekBar_rsb_scaleMax, 100);
+        scaleStep = Math.abs(a.getFloat(R.styleable.RangeSeekBar_rsb_scaleStep, DEFAULT_STEP));
         
-        Drawable aThumb = a.getDrawable(R.styleable.RangeSeekBar_thumb);
+        Drawable aThumb = a.getDrawable(R.styleable.RangeSeekBar_rsb_thumb);
         if(aThumb != null)
             thumb = aThumb;
         
-        Drawable aRange = a.getDrawable(R.styleable.RangeSeekBar_range);
+        Drawable aRange = a.getDrawable(R.styleable.RangeSeekBar_rsb_range);
         if(aRange != null)
             range = aRange;
         
-        Drawable aTrack = a.getDrawable(R.styleable.RangeSeekBar_track);
+        Drawable aTrack = a.getDrawable(R.styleable.RangeSeekBar_rsb_track);
         if(aTrack != null)
             track = aTrack;
         
         // Register desired amount of thumbs
-        int noThumbs = a.getInt(R.styleable.RangeSeekBar_thumbs, DEFAULT_THUMBS);
+        int noThumbs = a.getInt(R.styleable.RangeSeekBar_rsb_thumbs, DEFAULT_THUMBS);
         
         // NOTE using .getIntrinsicWidth() / .getIntrinsicHeight() here will make the thumbs
         // invisible if no thumbWidth / thumbHeight are given. I'd rather have the SeekBar always
         // show to not scare off beginners.
-        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, DEFAULT_THUMB_WIDTH);
-        thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, DEFAULT_THUMB_HEIGHT);
+        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_rsb_thumbWidth, DEFAULT_THUMB_WIDTH);
+        thumbHeight = a.getDimension(R.styleable.RangeSeekBar_rsb_thumbHeight, DEFAULT_THUMB_HEIGHT);
 
         initThumbs(noThumbs);
         
