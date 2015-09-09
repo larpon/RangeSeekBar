@@ -125,6 +125,9 @@ public class RangeSeekBar extends View {
         
         // Register desired amount of thumbs
         int noThumbs = a.getInt(R.styleable.RangeSeekBar_thumbs, DEFAULT_THUMBS);
+        // NOTE using .getIntrinsicWidth() / .getIntrinsicHeight() here will make the thumbs
+        // invisible if no thumbWidth / thumbHeight are given. I'd rather have the SeekBar always
+        // show to not scare off beginners.
         thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, DEFAULT_THUMB_WIDTH);
         thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, DEFAULT_THUMB_HEIGHT);
 
