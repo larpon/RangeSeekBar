@@ -125,9 +125,9 @@ public class RangeSeekBar extends View {
         
         // Register desired amount of thumbs
         int noThumbs = a.getInt(R.styleable.RangeSeekBar_thumbs, DEFAULT_THUMBS);
-        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, DEFAULT_THUMB_WIDTH);
-		thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, DEFAULT_THUMB_HEIGHT);
-		
+        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, thumb.getIntrinsicWidth());
+        thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, thumb.getIntrinsicHeight());
+
 		initThumbs(noThumbs);
         
         a.recycle();
@@ -182,6 +182,8 @@ public class RangeSeekBar extends View {
      */
     @Override
     public boolean onTouchEvent (MotionEvent event) {
+        if(!isEnabled())
+            return false;
     	if(!thumbs.isEmpty()) {
 
     		float coordinate = (orientation == VERTICAL) ? event.getY() : event.getX();
@@ -430,13 +432,13 @@ public class RangeSeekBar extends View {
 	    		Rect area1 = new Rect();
 	    		
 	    		if(orientation == VERTICAL) {
-	    			area1.left = 0 + getPaddingLeft();
+	    			area1.left = getPaddingLeft();
 		            area1.top = (int) thLow.pos;
 		            area1.right = getMeasuredWidth() - getPaddingRight();
 		            area1.bottom = (int) thHigh.pos;
 	    		} else {
 	    			area1.left = (int) thLow.pos;
-		            area1.top = 0 + getPaddingTop();
+		            area1.top = getPaddingTop();
 		            area1.right = (int) thHigh.pos;
 		            area1.bottom = getMeasuredHeight() - getPaddingBottom();
 	    		}
@@ -455,15 +457,15 @@ public class RangeSeekBar extends View {
     			Rect area1 = new Rect();
     			//Log.d(TAG,""+th.pos);
     			if(orientation == VERTICAL) {
-    				area1.left = 0 + getPaddingLeft();
+    				area1.left = getPaddingLeft();
     	            area1.top = (int) ((th.pos - thumbHalf) + getPaddingTop());
     	            area1.right = getMeasuredWidth() - getPaddingRight();
-    	            area1.bottom = (int) ((th.pos + thumbHalf) - getPaddingBottom());
+    	            area1.bottom = (int) ((th.pos + thumbHalf) + getPaddingTop());
     	            //Log.d(TAG,"th: "+th.pos);
 	    		} else {
 	    			area1.left = (int) ((th.pos - thumbHalf) + getPaddingLeft());
-    	            area1.top = 0 + getPaddingTop();
-    	            area1.right = (int) ((th.pos + thumbHalf) - getPaddingRight());
+    	            area1.top = getPaddingTop();
+    	            area1.right = (int) ((th.pos + thumbHalf) + getPaddingLeft());
     	            area1.bottom = getMeasuredHeight() - getPaddingBottom();
     	            //Log.d(TAG,"th: "+area1.toString());
 	    		}
@@ -519,6 +521,9 @@ public class RangeSeekBar extends View {
         int result = 0;
         int specMode = MeasureSpec.getMode(measureSpec);
         int specSize = MeasureSpec.getSize(measureSpec);
+
+        if (specMode == MeasureSpec.UNSPECIFIED)
+            return (int) (thumbHeight + getPaddingTop() + getPaddingBottom());
 
         if (specMode == MeasureSpec.EXACTLY) {
             // We were told how big to be
@@ -656,5 +661,16 @@ public class RangeSeekBar extends View {
 	
 	public boolean isSeeking() {
         return isSeeking;
+	}
+
+	@Override
+	protected void drawableStateChanged()
+	{
+		super.drawableStateChanged();
+
+		int[] drawableState = getDrawableState();
+		thumb.setState(drawableState);
+		track.setState(drawableState);
+		range.setState(drawableState);
 	}
 }
