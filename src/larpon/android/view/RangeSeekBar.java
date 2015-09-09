@@ -125,8 +125,8 @@ public class RangeSeekBar extends View {
         
         // Register desired amount of thumbs
         int noThumbs = a.getInt(R.styleable.RangeSeekBar_thumbs, DEFAULT_THUMBS);
-        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, thumb.getIntrinsicWidth());
-        thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, thumb.getIntrinsicHeight());
+        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, DEFAULT_THUMB_WIDTH);
+        thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, DEFAULT_THUMB_HEIGHT);
 
 		initThumbs(noThumbs);
         
