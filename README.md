@@ -1,6 +1,7 @@
 # RangeSeekBar
 
-This is an Android View that tries to mimic the behavior of the JQueryUI Slider widget.
+This is a custom Android View that tries to mimic the behavior of the JQueryUI Slider widget.
+![Screenshot of example app](https://github.com/Larpon/RangeSeekBarExamples/blob/master/screenshot.png "Screenshot of example app")
 
 RangeSeekBar is a custom view for the Android platform that makes it possible to have a SeekBar with more thumbs on it. The bar can be setup programmatically or via XML for both Horizontal and Vertical usecases. It supports custom drawables for the backgrund, track and thumbs.
 
