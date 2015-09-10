@@ -180,13 +180,17 @@ public class RangeSeekBar extends View {
     private int currentThumb = 0;
     private float lowLimit = pixelRangeMin;
     private float highLimit = pixelRangeMax;
+
     /**
      *  {@inheritDoc}
      */
     @Override
     public boolean onTouchEvent (MotionEvent event) {
+        super.onTouchEvent(event);
+
         if(!isEnabled())
             return false;
+
         if(!thumbs.isEmpty()) {
 
             float coordinate = (orientation == VERTICAL) ? event.getY() : event.getX();
@@ -198,11 +202,19 @@ public class RangeSeekBar extends View {
                 Log.d(TAG,"Closest "+currentThumb);
                 lowLimit = getLowerThumbRangeLimit(currentThumb);
                 highLimit = getHigherThumbRangeLimit(currentThumb);
+
+                //int[] state = new int[] { android.R.attr.state_window_focused, android.R.attr.state_pressed };
+                //thumb.setState(state);
             }
             
             if(action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-                //
+                //int[] state = new int[] { };
+                //thumb.setState(state);
             }
+
+            // Update drawable states here some day
+            //int[] state = new int[] {android.R.attr.state_window_focused, android.R.attr.state_focused };
+            //thumb.setState()
                 
             // Update thumb position
             // Make sure we stay in our tracks's bounds or limited by other thumbs
@@ -666,9 +678,11 @@ public class RangeSeekBar extends View {
         return isSeeking;
     }
 
+    /**
+     *  {@inheritDoc}
+     */
     @Override
-    protected void drawableStateChanged()
-    {
+    protected void drawableStateChanged() {
         super.drawableStateChanged();
 
         int[] drawableState = getDrawableState();
