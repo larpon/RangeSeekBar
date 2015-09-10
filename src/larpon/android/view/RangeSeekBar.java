@@ -42,9 +42,9 @@ public class RangeSeekBar extends View {
     private float scaleRangeMax;
     private float scaleStep;
     
-    private Drawable track;
-    private Drawable range;
-    private Drawable thumb;
+    private Drawable trackDrawable;
+    private Drawable rangeDrawable;
+    private Drawable thumbDrawable;
     
     private boolean firstRun;
     private boolean isSeeking;
@@ -69,9 +69,9 @@ public class RangeSeekBar extends View {
 
         if(this.getBackground() == null)
             this.setBackgroundDrawable(getResources().getDrawable(R.drawable.rangeseekbar));
-        thumb = getResources().getDrawable(R.drawable.thumb);
-        range = getResources().getDrawable(R.drawable.rangegradient);
-        track = getResources().getDrawable(R.drawable.trackgradient);
+        thumbDrawable = getResources().getDrawable(R.drawable.thumb);
+        rangeDrawable = getResources().getDrawable(R.drawable.rangegradient);
+        trackDrawable = getResources().getDrawable(R.drawable.trackgradient);
         
         firstRun = true;
         isSeeking = false;
@@ -100,36 +100,36 @@ public class RangeSeekBar extends View {
         TypedArray a = context.obtainStyledAttributes(attrs,R.styleable.RangeSeekBar);
         
         
-        String s = a.getString(R.styleable.RangeSeekBar_rsb_orientation);
+        String s = a.getString(R.styleable.RangeSeekBar_orientation);
         if(s != null)
             orientation = s.toLowerCase(Locale.ENGLISH).contains("vertical") ? VERTICAL : HORIZONTAL;
         
-        limitThumbRange = a.getBoolean(R.styleable.RangeSeekBar_rsb_limitThumbRange, true);
+        limitThumbRange = a.getBoolean(R.styleable.RangeSeekBar_limitThumbRange, true);
         
-        scaleRangeMin = a.getFloat(R.styleable.RangeSeekBar_rsb_scaleMin, 0);
-        scaleRangeMax = a.getFloat(R.styleable.RangeSeekBar_rsb_scaleMax, 100);
-        scaleStep = Math.abs(a.getFloat(R.styleable.RangeSeekBar_rsb_scaleStep, DEFAULT_STEP));
+        scaleRangeMin = a.getFloat(R.styleable.RangeSeekBar_scaleMin, 0);
+        scaleRangeMax = a.getFloat(R.styleable.RangeSeekBar_scaleMax, 100);
+        scaleStep = Math.abs(a.getFloat(R.styleable.RangeSeekBar_scaleStep, DEFAULT_STEP));
         
-        Drawable aThumb = a.getDrawable(R.styleable.RangeSeekBar_rsb_thumb);
+        Drawable aThumb = a.getDrawable(R.styleable.RangeSeekBar_thumbDrawable);
         if(aThumb != null)
-            thumb = aThumb;
+            thumbDrawable = aThumb;
         
-        Drawable aRange = a.getDrawable(R.styleable.RangeSeekBar_rsb_range);
+        Drawable aRange = a.getDrawable(R.styleable.RangeSeekBar_rangeDrawable);
         if(aRange != null)
-            range = aRange;
+            rangeDrawable = aRange;
         
-        Drawable aTrack = a.getDrawable(R.styleable.RangeSeekBar_rsb_track);
+        Drawable aTrack = a.getDrawable(R.styleable.RangeSeekBar_trackDrawable);
         if(aTrack != null)
-            track = aTrack;
+            trackDrawable = aTrack;
         
         // Register desired amount of thumbs
-        int noThumbs = a.getInt(R.styleable.RangeSeekBar_rsb_thumbs, DEFAULT_THUMBS);
+        int noThumbs = a.getInt(R.styleable.RangeSeekBar_thumbs, DEFAULT_THUMBS);
         
         // NOTE using .getIntrinsicWidth() / .getIntrinsicHeight() here will make the thumbs
         // invisible if no thumbWidth / thumbHeight are given. I'd rather have the SeekBar always
         // show to not scare off beginners.
-        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_rsb_thumbWidth, DEFAULT_THUMB_WIDTH);
-        thumbHeight = a.getDimension(R.styleable.RangeSeekBar_rsb_thumbHeight, DEFAULT_THUMB_HEIGHT);
+        thumbWidth = a.getDimension(R.styleable.RangeSeekBar_thumbWidth, DEFAULT_THUMB_WIDTH);
+        thumbHeight = a.getDimension(R.styleable.RangeSeekBar_thumbHeight, DEFAULT_THUMB_HEIGHT);
 
         initThumbs(noThumbs);
         
@@ -204,17 +204,17 @@ public class RangeSeekBar extends View {
                 highLimit = getHigherThumbRangeLimit(currentThumb);
 
                 //int[] state = new int[] { android.R.attr.state_window_focused, android.R.attr.state_pressed };
-                //thumb.setState(state);
+                //thumbDrawable.setState(state);
             }
             
             if(action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
                 //int[] state = new int[] { };
-                //thumb.setState(state);
+                //thumbDrawable.setState(state);
             }
 
             // Update drawable states here some day
             //int[] state = new int[] {android.R.attr.state_window_focused, android.R.attr.state_focused };
-            //thumb.setState()
+            //thumbDrawable.setState()
                 
             // Update thumb position
             // Make sure we stay in our tracks's bounds or limited by other thumbs
@@ -408,15 +408,15 @@ public class RangeSeekBar extends View {
     }
     
     private void drawGutter(Canvas canvas) {
-        if(track != null) {
+        if(trackDrawable != null) {
             //Log.d(TAG,"gutterbg: "+gutterBackground.toString());
             Rect area1 = new Rect();
             area1.left = 0 + getPaddingLeft();
             area1.top = 0 + getPaddingTop();
             area1.right = getMeasuredWidth() - getPaddingRight();
             area1.bottom = getMeasuredHeight() - getPaddingBottom();
-            track.setBounds(area1);
-            track.draw(canvas);
+            trackDrawable.setBounds(area1);
+            trackDrawable.draw(canvas);
         }
     }
     
@@ -443,7 +443,7 @@ public class RangeSeekBar extends View {
                 thLow = new Thumb();
             //Log.d(TAG,"l: "+thLow.pos+" h: "+thHigh.pos);
             
-            if(range != null) {
+            if(rangeDrawable != null) {
                 Rect area1 = new Rect();
                 
                 if(orientation == VERTICAL) {
@@ -457,8 +457,8 @@ public class RangeSeekBar extends View {
                     area1.right = (int) thHigh.pos;
                     area1.bottom = getMeasuredHeight() - getPaddingBottom();
                 }
-                range.setBounds(area1);
-                range.draw(canvas);
+                rangeDrawable.setBounds(area1);
+                rangeDrawable.draw(canvas);
             }
         }
     }
@@ -485,9 +485,9 @@ public class RangeSeekBar extends View {
                     //Log.d(TAG,"th: "+area1.toString());
                 }
                 
-                if(thumb != null) {
-                    thumb.setBounds(area1);
-                    thumb.draw(canvas);
+                if(thumbDrawable != null) {
+                    thumbDrawable.setBounds(area1);
+                    thumbDrawable.draw(canvas);
                 }
             }
         }
@@ -640,28 +640,28 @@ public class RangeSeekBar extends View {
         this.scaleStep = scaleStep;
     }
 
-    public Drawable getTrack() {
-        return track;
+    public Drawable getTrackDrawable() {
+        return trackDrawable;
     }
 
-    public void setTrack(Drawable track) {
-        this.track = track;
+    public void setTrackDrawable(Drawable trackDrawable) {
+        this.trackDrawable = trackDrawable;
     }
 
-    public Drawable getRange() {
-        return range;
+    public Drawable getRangeDrawable() {
+        return rangeDrawable;
     }
 
-    public void setRange(Drawable range) {
-        this.range = range;
+    public void setRangeDrawable(Drawable rangeDrawable) {
+        this.rangeDrawable = rangeDrawable;
     }
 
-    public Drawable getThumb() {
-        return thumb;
+    public Drawable getThumbDrawable() {
+        return thumbDrawable;
     }
 
-    public void setThumb(Drawable thumb) {
-        this.thumb = thumb;
+    public void setThumbDrawable(Drawable thumbDrawable) {
+        this.thumbDrawable = thumbDrawable;
     }
 
     public void initThumbs(int noThumbs) {
@@ -686,8 +686,8 @@ public class RangeSeekBar extends View {
         super.drawableStateChanged();
 
         int[] drawableState = getDrawableState();
-        thumb.setState(drawableState);
-        track.setState(drawableState);
-        range.setState(drawableState);
+        thumbDrawable.setState(drawableState);
+        trackDrawable.setState(drawableState);
+        rangeDrawable.setState(drawableState);
     }
 }
