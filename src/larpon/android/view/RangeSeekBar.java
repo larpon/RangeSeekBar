@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -67,8 +68,12 @@ public class RangeSeekBar extends View {
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
 
-        if(this.getBackground() == null)
-            this.setBackgroundDrawable(getResources().getDrawable(R.drawable.rangeseekbar));
+        if(this.getBackground() == null) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN)
+                this.setBackgroundDrawable(getResources().getDrawable(R.drawable.rangeseekbar));
+            else
+                this.setBackground(getResources().getDrawable(R.drawable.rangeseekbar));
+        }
         thumbDrawable = getResources().getDrawable(R.drawable.thumb);
         rangeDrawable = getResources().getDrawable(R.drawable.rangegradient);
         trackDrawable = getResources().getDrawable(R.drawable.trackgradient);
@@ -157,14 +162,13 @@ public class RangeSeekBar extends View {
             distributeThumbsEvenly();
             // Fire listener callback
             if(listener != null)
-                listener.onCreate(this, currentThumb, getThumbValue(currentThumb));
+                listener.onCreate(this, currentThumbIndex, getThumbAt(currentThumbIndex).getValue());
             firstRun = false;
         }
     }
     
     /**
-     * Draw
-     * 
+     * {@inheritDoc}
      * @see android.view.View#onDraw(android.graphics.Canvas)
      */
     @Override
@@ -177,7 +181,8 @@ public class RangeSeekBar extends View {
         
     }
     
-    private int currentThumb = 0;
+    private int currentThumbIndex = 0;
+    private Thumb currentThumb = null;
     private float lowLimit = pixelRangeMin;
     private float highLimit = pixelRangeMax;
 
@@ -198,58 +203,56 @@ public class RangeSeekBar extends View {
             
             // Find thumb closest to event coordinate on screen touch
             if(action == MotionEvent.ACTION_DOWN) {
-                currentThumb = getClosestThumb(coordinate);
-                Log.d(TAG,"Closest "+currentThumb);
-                lowLimit = getLowerThumbRangeLimit(currentThumb);
-                highLimit = getHigherThumbRangeLimit(currentThumb);
+                currentThumbIndex = getClosestThumbIndex(coordinate);
+                currentThumb = getThumbAt(currentThumbIndex);
 
-                //int[] state = new int[] { android.R.attr.state_window_focused, android.R.attr.state_pressed };
-                //thumbDrawable.setState(state);
+                Log.d(TAG,"Closest thumb index "+ currentThumbIndex);
+                lowLimit = getLowerThumbRangeLimit(currentThumbIndex);
+                highLimit = getHigherThumbRangeLimit(currentThumbIndex);
+
+                int[] state = new int[] { android.R.attr.state_window_focused, android.R.attr.state_pressed };
+                currentThumb.getDrawable().setState(state);
             }
             
             if(action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-                //int[] state = new int[] { };
-                //thumbDrawable.setState(state);
+                int[] state = new int[] { };
+                currentThumb.getDrawable().setState(state);
             }
-
-            // Update drawable states here some day
-            //int[] state = new int[] {android.R.attr.state_window_focused, android.R.attr.state_focused };
-            //thumbDrawable.setState()
                 
             // Update thumb position
             // Make sure we stay in our tracks's bounds or limited by other thumbs
             if(coordinate < lowLimit) {
-                if(lowLimit == highLimit && currentThumb >= thumbs.size()-1) {
-                    currentThumb = getUnstuckFrom(currentThumb);
-                    setThumbPos(currentThumb,coordinate);
-                    lowLimit = getLowerThumbRangeLimit(currentThumb);
-                    highLimit = getHigherThumbRangeLimit(currentThumb);
+                if(lowLimit == highLimit && currentThumbIndex >= thumbs.size()-1) {
+                    currentThumbIndex = getUnstuckFrom(currentThumbIndex);
+                    currentThumb.setPosition(coordinate);
+                    lowLimit = getLowerThumbRangeLimit(currentThumbIndex);
+                    highLimit = getHigherThumbRangeLimit(currentThumbIndex);
                 } else
-                    setThumbPos(currentThumb,lowLimit);
+                    currentThumb.setPosition(lowLimit);
                 //Log.d(TAG,"Setting low "+low);
             } else if(coordinate > highLimit) {
-                setThumbPos(currentThumb,highLimit);
+                currentThumb.setPosition(highLimit);
                 //Log.d(TAG,"Setting high "+high);
             } else {
                 coordinate = asStep(coordinate);
-                setThumbPos(currentThumb,coordinate);
+                currentThumb.setPosition(coordinate);
                 //Log.d(TAG,"Setting coordinate "+coordinate);
             }
 
-            float thumbValue = getThumbValue(currentThumb);
+            float thumbValue = currentThumb.getValue();
             
             // Fire listener callbacks
             if(listener != null) {
                 
                 // Find thumb closest to event coordinate on screen touch
                 if(action == MotionEvent.ACTION_DOWN) {
-                    listener.onSeekStart(this, currentThumb, thumbValue);
+                    listener.onSeekStart(this, currentThumbIndex, thumbValue);
                     isSeeking = true;
                 } else if(action == MotionEvent.ACTION_CANCEL || action == MotionEvent.ACTION_UP) {
-                    listener.onSeekStop(this, currentThumb, thumbValue);
+                    listener.onSeekStop(this, currentThumbIndex, thumbValue);
                     isSeeking = false;
                 } else
-                    listener.onSeek(this, currentThumb, thumbValue);
+                    listener.onSeek(this, currentThumbIndex, thumbValue);
             }
             // Tell the view we want a complete redraw
             //invalidate();
@@ -262,10 +265,10 @@ public class RangeSeekBar extends View {
     
     private int getUnstuckFrom(int index) {
         int unstuck = 0;
-        float lastVal = thumbs.get(index).val;
+        float lastVal = getThumbAt(index).getValue();
         for(int i = index-1; i >= 0; i--) {
-            Thumb th = thumbs.get(i);
-            if(th.val != lastVal)
+            Thumb thumb = getThumbAt(i);
+            if(thumb.getValue() != lastVal)
                 return i+1;
         }
         return unstuck;
@@ -308,30 +311,16 @@ public class RangeSeekBar extends View {
         //Log.d(TAG,"pixelVal: "+pixelValue+" smin: "+scaleMin+" smax: "+scaleMax);
         return pixelValue;
     }
-    
-    private void calculateThumbValue(int index) {
-        if(index < thumbs.size() && !thumbs.isEmpty()) {
-            Thumb th = thumbs.get(index);
-            th.val = pixelToScale(th.pos);
-        }
-    }
-    
-    private void calculateThumbPos(int index) {
-        if(index < thumbs.size() && !thumbs.isEmpty()) {
-            Thumb th = thumbs.get(index);
-            th.pos = scaleToPixel(th.val);
-        }
-    }
 
     private float getLowerThumbRangeLimit(int index) {
         float limit = pixelRangeMin; 
         if(limitThumbRange && index < thumbs.size() && !thumbs.isEmpty()) {
-            Thumb th = thumbs.get(index);
+            Thumb thumb = getThumbAt(index);
             for(int i = 0; i < thumbs.size(); i++) {
                 if(i < index) {
-                    Thumb tht = thumbs.get(i);
-                    if(tht.pos <= th.pos && tht.pos > limit) {
-                        limit = tht.pos;
+                    Thumb tht = getThumbAt(i);
+                    if(tht.getPosition() <= thumb.getPosition() && tht.getPosition() > limit) {
+                        limit = tht.getPosition();
                         //Log.d(TAG,"New low limit: "+limit+" i:"+i+" index: "+index);
                     }
                 }
@@ -343,12 +332,12 @@ public class RangeSeekBar extends View {
     private float getHigherThumbRangeLimit(int index) {
         float limit = pixelRangeMax; 
         if(limitThumbRange && index < thumbs.size() && !thumbs.isEmpty()) {
-            Thumb th = thumbs.get(index);
+            Thumb thumb = getThumbAt(index);
             for(int i = 0; i < thumbs.size(); i++) {
                 if(i > index) {
-                    Thumb tht = thumbs.get(i);
-                    if(tht.pos >= th.pos && tht.pos < limit) {
-                        limit = tht.pos;
+                    Thumb tht = getThumbAt(i);
+                    if(tht.getPosition() >= thumb.getPosition() && tht.getPosition() < limit) {
+                        limit = tht.getPosition();
                         //Log.d(TAG,"New high limit: "+limit+" i:"+i+" index: "+index);
                     }
                 }
@@ -363,39 +352,35 @@ public class RangeSeekBar extends View {
             float even = pixelRangeMax/noThumbs;
             float lastPos = even/2;
             for(int i = 0; i < thumbs.size(); i++) {
-                setThumbPos(i, asStep(lastPos));
+                getThumbAt(i).setPosition(asStep(lastPos));
                 //Log.d(TAG,"lp: "+lastPos);
                 lastPos += even;
             }
         }
     }
-    
+
+    public Thumb getThumbAt(int index) { return thumbs.get(index); }
+
+    @Deprecated
     public float getThumbValue(int index) {
-        return thumbs.get(index).val;
+        return getThumbAt(index).getValue();
     }
-    
+
+    @Deprecated
     public void setThumbValue(int index, float value) {
-        thumbs.get(index).val = value;
-        calculateThumbPos(index);
-        // Tell the view we want a complete redraw
-        invalidate();
-    }
-    
-    private void setThumbPos(int index, float pos) {
-        thumbs.get(index).pos = pos;
-        calculateThumbValue(index);
+        getThumbAt(index).setValue(value);
         // Tell the view we want a complete redraw
         invalidate();
     }
 
-    private int getClosestThumb(float coordinate) {
+    private int getClosestThumbIndex(float coordinate) {
         int closest = 0;
         if(!thumbs.isEmpty()) {
             float shortestDistance = pixelRangeMax+thumbHalf+((orientation == VERTICAL) ? (getPaddingTop()+getPaddingBottom()) : (getPaddingLeft() + getPaddingRight()));
             // Oldschool for-loop to have access to index
             for(int i = 0; i < thumbs.size(); i++) {
                 // Find thumb closest to x coordinate
-                float tcoordinate = thumbs.get(i).pos;
+                float tcoordinate = getThumbAt(i).getPosition();
                 float distance = Math.abs(coordinate-tcoordinate);
                 if(distance <= shortestDistance) {
                     shortestDistance = distance;
@@ -410,54 +395,41 @@ public class RangeSeekBar extends View {
     private void drawGutter(Canvas canvas) {
         if(trackDrawable != null) {
             //Log.d(TAG,"gutterbg: "+gutterBackground.toString());
-            Rect area1 = new Rect();
-            area1.left = 0 + getPaddingLeft();
-            area1.top = 0 + getPaddingTop();
-            area1.right = getMeasuredWidth() - getPaddingRight();
-            area1.bottom = getMeasuredHeight() - getPaddingBottom();
-            trackDrawable.setBounds(area1);
+            Rect gutterRectangle = new Rect();
+            gutterRectangle.left = getPaddingLeft();
+            gutterRectangle.top = getPaddingTop();
+            gutterRectangle.right = getMeasuredWidth() - getPaddingRight();
+            gutterRectangle.bottom = getMeasuredHeight() - getPaddingBottom();
+            trackDrawable.setBounds(gutterRectangle);
             trackDrawable.draw(canvas);
         }
     }
-    
-    /*
-    RectF area = new RectF();
-    area.left = 0 + getPaddingLeft() + minPos;
-    area.top = 0 + getPaddingTop();
-    area.right = getMeasuredWidth() - getPaddingRight() + maxPos;
-    area.bottom = getMeasuredHeight() - getPaddingBottom();
-    
-    Paint p = new Paint();
-    p.setAntiAlias(true);
-    p.setColor(gutterColor);
-    canvas.drawRoundRect(area, 7.5f, 7.5f, p);
-    */
-    
+
     private void drawRange(Canvas canvas) {
         if(!thumbs.isEmpty()) {
-            Thumb thLow = thumbs.get(getClosestThumb(0));
-            Thumb thHigh = thumbs.get(getClosestThumb(pixelRangeMax));
+            Thumb lowThumb = thumbs.get(getClosestThumbIndex(0));
+            Thumb highThumb = thumbs.get(getClosestThumbIndex(pixelRangeMax));
             
             // If we only have 1 thumb - choose to draw from 0 in scale
             if(thumbs.size() == 1)
-                thLow = new Thumb();
-            //Log.d(TAG,"l: "+thLow.pos+" h: "+thHigh.pos);
+                lowThumb = new Thumb(getThumbDrawable());
+            //Log.d(TAG,"l: "+lowThumb.pos+" h: "+highThumb.pos);
             
             if(rangeDrawable != null) {
-                Rect area1 = new Rect();
+                Rect rangeRectangle = new Rect();
                 
                 if(orientation == VERTICAL) {
-                    area1.left = getPaddingLeft();
-                    area1.top = (int) thLow.pos;
-                    area1.right = getMeasuredWidth() - getPaddingRight();
-                    area1.bottom = (int) thHigh.pos;
+                    rangeRectangle.left = getPaddingLeft();
+                    rangeRectangle.top = (int) lowThumb.position;
+                    rangeRectangle.right = getMeasuredWidth() - getPaddingRight();
+                    rangeRectangle.bottom = (int) highThumb.position;
                 } else {
-                    area1.left = (int) thLow.pos;
-                    area1.top = getPaddingTop();
-                    area1.right = (int) thHigh.pos;
-                    area1.bottom = getMeasuredHeight() - getPaddingBottom();
+                    rangeRectangle.left = (int) lowThumb.position;
+                    rangeRectangle.top = getPaddingTop();
+                    rangeRectangle.right = (int) highThumb.position;
+                    rangeRectangle.bottom = getMeasuredHeight() - getPaddingBottom();
                 }
-                rangeDrawable.setBounds(area1);
+                rangeDrawable.setBounds(rangeRectangle);
                 rangeDrawable.draw(canvas);
             }
         }
@@ -465,29 +437,26 @@ public class RangeSeekBar extends View {
     
     private void drawThumbs(Canvas canvas) {
         if(!thumbs.isEmpty()) {
-            //Paint p = new Paint();
-            
-            
-            for(Thumb th : thumbs) {
-                Rect area1 = new Rect();
-                //Log.d(TAG,""+th.pos);
+            for(Thumb thumb : thumbs) {
+                Rect thumbRectangle = new Rect();
+                //Log.d(TAG,""+thumb.pos);
                 if(orientation == VERTICAL) {
-                    area1.left = getPaddingLeft();
-                    area1.top = (int) ((th.pos - thumbHalf) + getPaddingTop());
-                    area1.right = getMeasuredWidth() - getPaddingRight();
-                    area1.bottom = (int) ((th.pos + thumbHalf) + getPaddingTop());
-                    //Log.d(TAG,"th: "+th.pos);
+                    thumbRectangle.left = getPaddingLeft();
+                    thumbRectangle.top = (int) ((thumb.position - thumbHalf) + getPaddingTop());
+                    thumbRectangle.right = getMeasuredWidth() - getPaddingRight();
+                    thumbRectangle.bottom = (int) ((thumb.position + thumbHalf) + getPaddingTop());
+                    //Log.d(TAG,"thumb: "+thumb.pos);
                 } else {
-                    area1.left = (int) ((th.pos - thumbHalf) + getPaddingLeft());
-                    area1.top = getPaddingTop();
-                    area1.right = (int) ((th.pos + thumbHalf) + getPaddingLeft());
-                    area1.bottom = getMeasuredHeight() - getPaddingBottom();
-                    //Log.d(TAG,"th: "+area1.toString());
+                    thumbRectangle.left = (int) ((thumb.position - thumbHalf) + getPaddingLeft());
+                    thumbRectangle.top = getPaddingTop();
+                    thumbRectangle.right = (int) ((thumb.position + thumbHalf) + getPaddingLeft());
+                    thumbRectangle.bottom = getMeasuredHeight() - getPaddingBottom();
+                    //Log.d(TAG,"thumb: "+thumbRectangle.toString());
                 }
                 
-                if(thumbDrawable != null) {
-                    thumbDrawable.setBounds(area1);
-                    thumbDrawable.draw(canvas);
+                if(thumb.getDrawable() != null) {
+                    thumb.getDrawable().setBounds(thumbRectangle);
+                    thumb.getDrawable().draw(canvas);
                 }
             }
         }
@@ -564,20 +533,56 @@ public class RangeSeekBar extends View {
     }
     
     public class Thumb {
-        public float val;
-        public float pos;
+        private float value;
+        private float position;
+        private Drawable drawable;
 
-        public Thumb() {
-            val = 0;
-            pos = 0;
+        public Thumb(Drawable drawable) {
+            value = 0;
+            position = 0;
+            // Clone the drawable so we can set the states individually
+            this.drawable = drawable.getConstantState().newDrawable();
         }
+
+        public Drawable getDrawable() {
+            return drawable;
+        }
+
+        public void setDrawable(Drawable drawable) {
+            this.drawable = drawable;
+        }
+
+        public float getPosition() {
+            return position;
+        }
+
+        public void setPosition(float position) {
+            this.position = position;
+            // Update value based on new position
+            this.value = pixelToScale(position);
+            // Tell the view we want a complete redraw
+            invalidate();
+        }
+
+        public float getValue() {
+            return value;
+        }
+
+        public void setValue(float value) {
+            this.value = value;
+            // Update position based on new value
+            this.position = scaleToPixel(value);
+            // Tell the view we want a complete redraw
+            invalidate();
+        }
+
     }
 
     public interface RangeSeekBarListener {
-        public void onCreate(RangeSeekBar rangeSeekBar, int index, float value);
-        public void onSeek(RangeSeekBar rangeSeekBar, int index, float value);
-        public void onSeekStart(RangeSeekBar rangeSeekBar, int index, float value);
-        public void onSeekStop(RangeSeekBar rangeSeekBar, int index, float value);
+        void onCreate(RangeSeekBar rangeSeekBar, int index, float value);
+        void onSeek(RangeSeekBar rangeSeekBar, int index, float value);
+        void onSeekStart(RangeSeekBar rangeSeekBar, int index, float value);
+        void onSeekStop(RangeSeekBar rangeSeekBar, int index, float value);
     }
     
     public void setListener(RangeSeekBarListener listener) {
@@ -668,8 +673,8 @@ public class RangeSeekBar extends View {
         if(thumbs != null) {
             thumbs.clear();
             for(int i = 0; i < noThumbs; i++) {
-                Thumb th = new Thumb();
-                thumbs.add(th);
+                Thumb thumb = new Thumb(getThumbDrawable());
+                thumbs.add(thumb);
             }
         }
     }
@@ -686,8 +691,12 @@ public class RangeSeekBar extends View {
         super.drawableStateChanged();
 
         int[] drawableState = getDrawableState();
-        thumbDrawable.setState(drawableState);
         trackDrawable.setState(drawableState);
         rangeDrawable.setState(drawableState);
+        if(!thumbs.isEmpty()) {
+            for(Thumb thumb : thumbs) {
+                thumb.getDrawable().setState(drawableState);
+            }
+        }
     }
 }
