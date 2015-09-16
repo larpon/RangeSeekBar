@@ -13,7 +13,7 @@ import android.view.View;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class RangeSeekBar extends View {
 
@@ -63,7 +63,7 @@ public class RangeSeekBar extends View {
         thumbWidth = DEFAULT_THUMB_WIDTH;
         thumbHeight = DEFAULT_THUMB_HEIGHT;
 
-        thumbs = new Vector<Thumb>();
+        thumbs = new ArrayList<Thumb>();
         
         this.setFocusable(true);
         this.setFocusableInTouchMode(true);
