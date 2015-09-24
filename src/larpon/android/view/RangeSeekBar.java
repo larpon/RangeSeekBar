@@ -3,7 +3,6 @@ package larpon.android.view;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -395,12 +394,12 @@ public class RangeSeekBar extends View {
     private void drawGutter(Canvas canvas) {
         if(trackDrawable != null) {
             //Log.d(TAG,"gutterbg: "+gutterBackground.toString());
-            Rect gutterRectangle = new Rect();
-            gutterRectangle.left = getPaddingLeft();
-            gutterRectangle.top = getPaddingTop();
-            gutterRectangle.right = getMeasuredWidth() - getPaddingRight();
-            gutterRectangle.bottom = getMeasuredHeight() - getPaddingBottom();
-            trackDrawable.setBounds(gutterRectangle);
+            int left, top, right, bottom;
+            left = getPaddingLeft();
+            top = getPaddingTop();
+            right = getMeasuredWidth() - getPaddingRight();
+            bottom = getMeasuredHeight() - getPaddingBottom();
+            trackDrawable.setBounds(left, top, right, bottom);
             trackDrawable.draw(canvas);
         }
     }
@@ -416,20 +415,20 @@ public class RangeSeekBar extends View {
             //Log.d(TAG,"l: "+lowThumb.pos+" h: "+highThumb.pos);
             
             if(rangeDrawable != null) {
-                Rect rangeRectangle = new Rect();
+                int left, top, right, bottom;
                 
                 if(orientation == VERTICAL) {
-                    rangeRectangle.left = getPaddingLeft();
-                    rangeRectangle.top = (int) lowThumb.position;
-                    rangeRectangle.right = getMeasuredWidth() - getPaddingRight();
-                    rangeRectangle.bottom = (int) highThumb.position;
+                    left = getPaddingLeft();
+                    top = (int) lowThumb.position;
+                    right = getMeasuredWidth() - getPaddingRight();
+                    bottom = (int) highThumb.position;
                 } else {
-                    rangeRectangle.left = (int) lowThumb.position;
-                    rangeRectangle.top = getPaddingTop();
-                    rangeRectangle.right = (int) highThumb.position;
-                    rangeRectangle.bottom = getMeasuredHeight() - getPaddingBottom();
+                    left = (int) lowThumb.position;
+                    top = getPaddingTop();
+                    right = (int) highThumb.position;
+                    bottom = getMeasuredHeight() - getPaddingBottom();
                 }
-                rangeDrawable.setBounds(rangeRectangle);
+                rangeDrawable.setBounds(left, top, right, bottom);
                 rangeDrawable.draw(canvas);
             }
         }
@@ -438,24 +437,24 @@ public class RangeSeekBar extends View {
     private void drawThumbs(Canvas canvas) {
         if(!thumbs.isEmpty()) {
             for(Thumb thumb : thumbs) {
-                Rect thumbRectangle = new Rect();
+                int left, top, right, bottom;
                 //Log.d(TAG,""+thumb.pos);
                 if(orientation == VERTICAL) {
-                    thumbRectangle.left = getPaddingLeft();
-                    thumbRectangle.top = (int) ((thumb.position - thumbHalf) + getPaddingTop());
-                    thumbRectangle.right = getMeasuredWidth() - getPaddingRight();
-                    thumbRectangle.bottom = (int) ((thumb.position + thumbHalf) + getPaddingTop());
+                    left = getPaddingLeft();
+                    top = (int) ((thumb.position - thumbHalf) + getPaddingTop());
+                    right = getMeasuredWidth() - getPaddingRight();
+                    bottom = (int) ((thumb.position + thumbHalf) + getPaddingTop());
                     //Log.d(TAG,"thumb: "+thumb.pos);
                 } else {
-                    thumbRectangle.left = (int) ((thumb.position - thumbHalf) + getPaddingLeft());
-                    thumbRectangle.top = getPaddingTop();
-                    thumbRectangle.right = (int) ((thumb.position + thumbHalf) + getPaddingLeft());
-                    thumbRectangle.bottom = getMeasuredHeight() - getPaddingBottom();
+                    left = (int) ((thumb.position - thumbHalf) + getPaddingLeft());
+                    top = getPaddingTop();
+                    right = (int) ((thumb.position + thumbHalf) + getPaddingLeft());
+                    bottom = getMeasuredHeight() - getPaddingBottom();
                     //Log.d(TAG,"thumb: "+thumbRectangle.toString());
                 }
                 
                 if(thumb.getDrawable() != null) {
-                    thumb.getDrawable().setBounds(thumbRectangle);
+                    thumb.getDrawable().setBounds(left, top, right, bottom);
                     thumb.getDrawable().draw(canvas);
                 }
             }
