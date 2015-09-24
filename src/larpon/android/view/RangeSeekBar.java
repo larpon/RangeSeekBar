@@ -393,8 +393,8 @@ public class RangeSeekBar extends View {
             int left, top, right, bottom;
             left = getPaddingLeft();
             top = getPaddingTop();
-            right = getMeasuredWidth() - getPaddingRight();
-            bottom = getMeasuredHeight() - getPaddingBottom();
+            right = getWidth() - getPaddingRight();
+            bottom = getHeight() - getPaddingBottom();
             trackDrawable.setBounds(left, top, right, bottom);
             trackDrawable.draw(canvas);
         }
