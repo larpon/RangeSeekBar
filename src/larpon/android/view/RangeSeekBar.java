@@ -36,8 +36,6 @@ public class RangeSeekBar extends View {
     private float pixelRangeMax;
     private int orientation;
     private boolean limitThumbRange;
-    private int viewWidth;
-    private int viewHeight;
     private float scaleRangeMin;
     private float scaleRangeMax;
     private float scaleStep;
@@ -55,9 +53,6 @@ public class RangeSeekBar extends View {
         scaleRangeMin = 0;
         scaleRangeMax = 100;
         scaleStep = DEFAULT_STEP;
-        
-        viewWidth = 0;
-        viewHeight = 0;
         
         thumbWidth = DEFAULT_THUMB_WIDTH;
         thumbHeight = DEFAULT_THUMB_HEIGHT;
@@ -147,11 +142,12 @@ public class RangeSeekBar extends View {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        viewWidth = measureWidth(widthMeasureSpec);
-        viewHeight = measureHeight(heightMeasureSpec);
-        setMeasuredDimension(viewWidth,viewHeight);
-        
-        // 
+        setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
+    }
+
+    @Override
+    protected void onSizeChanged(int viewWidth, int viewHeight, int oldw, int oldh)
+    {
         thumbHalf = (orientation == VERTICAL) ? (thumbHeight/2) : (thumbWidth/2);
         pixelRangeMin = 0 + thumbHalf;
         pixelRangeMax = (orientation == VERTICAL) ? viewHeight : viewWidth;
