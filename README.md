@@ -5,7 +5,7 @@ This is a custom Android View that tries to mimic the behavior of the JQueryUI S
 
 RangeSeekBar is a custom view for the Android platform that makes it possible to have a SeekBar with more thumbs on it. The bar can be setup programmatically or via XML for both Horizontal and Vertical usecases. It supports custom drawables for the backgrund, track and thumbs.
 
-The view should work on Android devices from API level 3 and up (Android 1.5).
+The view should work on Android devices from API level 4 and up (Android 1.6 Donut).
 
 ---
 
@@ -30,7 +30,7 @@ Then, to use the library in your project add the following to your `build.gradle
 
 ```groovy
 dependencies {
-    compile 'larpon.android.view:range-seek-bar:1.0.0'
+    compile 'larpon.android.view:range-seek-bar:1.2.1'
 }
 ```
 

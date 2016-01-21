@@ -9,7 +9,7 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
-version = "1.0.0"
+version = "1.2.1"
 group = "larpon.android.view"
 archivesBaseName = "range-seek-bar"
 
@@ -24,8 +24,8 @@ android {
     defaultConfig {
         minSdkVersion 4
         targetSdkVersion 23
-        versionCode 1
-        versionName "1.0.0"
+        versionCode 5
+        versionName "1.2.1"
     }
 
     sourceSets {
