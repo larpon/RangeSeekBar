@@ -7,7 +7,7 @@ RangeSeekBar is a custom view for the Android platform that makes it possible to
 
 The view should work on Android devices from API level 4 and up (Android 1.6 Donut).
 
-The API level bump from 3 to 4 - and contributed explanation can be found in commit 3deea24
+The API level bump from 3 to 4 explanation can be found in [this commit](https://github.com/Larpon/RangeSeekBar/commit/3deea24f3c8318bd1f8ccff05a9c1e5b91b8b5b5)
 
 ---
 
