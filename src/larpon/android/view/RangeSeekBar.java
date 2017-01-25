@@ -10,9 +10,17 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.ArrayList;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class RangeSeekBar extends View {
 
@@ -385,6 +393,52 @@ public class RangeSeekBar extends View {
             }
         }
         return closest;
+    }
+
+    private List<Integer> getClosestThumbsIndex(float coordinate, int amount) {
+        List<Integer> results = new ArrayList<Integer>();
+        if(!thumbs.isEmpty()) {
+            HashMap<Integer,Float> map = new HashMap<Integer,Float>();
+            for(int i = 0; i < thumbs.size() && results.size() <= amount; i++) {
+                // Find amount thumbs closest to x coordinate
+                float tcoordinate = getThumbAt(i).getPosition();
+                float distance = Math.abs(coordinate-tcoordinate);
+                map.put(i,distance);
+            }
+            Map<Integer,Float> sortedMap = sortByComparator(map, false);
+            Iterator it = sortedMap.entrySet().iterator();
+            while (it.hasNext() && results.size() <= amount) {
+                Map.Entry pair = (Map.Entry)it.next();
+                results.add((Integer) pair.getKey());
+                it.remove(); // avoids a ConcurrentModificationException
+            }
+        }
+        return results;
+    }
+
+    private static Map<Integer,Float> sortByComparator(Map<Integer,Float> unsortMap, final boolean order)
+    {
+
+        List<Entry<Integer,Float>> list = new LinkedList<Entry<Integer,Float>>(unsortMap.entrySet());
+
+        // Sorting the list based on values
+        Collections.sort(list, new Comparator<Entry<Integer,Float>>() {
+            public int compare(Entry<Integer,Float> o1,
+                               Entry<Integer,Float> o2) {
+                if (order) {
+                    return o1.getValue().compareTo(o2.getValue());
+                } else {
+                    return o2.getValue().compareTo(o1.getValue());
+
+                }
+            }
+        });
+
+        // Maintaining insertion order with the help of LinkedList
+        Map<Integer, Float> sortedMap = new LinkedHashMap<>();
+        for (Entry<Integer,Float> entry : list) sortedMap.put(entry.getKey(), entry.getValue());
+
+        return sortedMap;
     }
     
     private void drawGutter(Canvas canvas) {
