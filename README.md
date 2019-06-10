@@ -13,10 +13,12 @@ The explanation for the API level bump from 3 to 4 can be found in [this commit]
 
 ## Usage
 
-###Android Studio
+### Android Studio
+
 The [examples repository](https://github.com/Larpon/RangeSeekBarExamples) is an example on how to use RangeSeekBar as a library in Android Studio.
 
-###Eclipse
+### Eclipse
+
 To include this library in your project please refer to Lars Vogel's tutorial on how to use Android libraries with Eclipse:
 http://www.vogella.com/tutorials/AndroidLibraryProjects/article.html
 
